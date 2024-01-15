@@ -3,7 +3,6 @@ from sklearn.cluster import KMeans
 
 
 class BFR:
-
     def __init__(self, k, data):
         self.k = k
         self.d = data
@@ -12,10 +11,10 @@ class BFR:
         self.CS = []
         self.RS = []
 
-    def calculate_variance(cluster):
+    def calculate_variance(self, cluster):
         return (cluster['SUMQ'] / cluster['N']) - (cluster['SUM'] / cluster['N']) ** 2
 
-    def calculate_standard_deviation(variance):
+    def calculate_standard_deviation(self, variance):
         return np.sqrt(variance)
 
     def calculate_normalized_distance(self, centroid, point, standard_deviation):
@@ -35,15 +34,9 @@ class BFR:
         self.kmeans.fit(data)
         centroids = self.kmeans.cluster_centers_
 
-        # dies diente zu Testzwecken
-       # centroid_test = np.array([[5, 1], [6, -2], [7, 0]])
-
         for i, centroid in enumerate(centroids):
             cluster = {'SUM': centroid, 'SUMQ': centroid ** 2, 'N': 1}
             self.DS.append(cluster)
-
-        #SUM = [np.sum(centroids[i]) for i in range(N)]
-        #SUMQ = [np.sum(centroids[i] ** 2) for i in range(N)]
 
         return self.DS
 
