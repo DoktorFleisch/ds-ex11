@@ -3,6 +3,7 @@ from sklearn.cluster import KMeans
 
 
 class BFR:
+
     def __init__(self, k):
         self.k = k
         self.dimension = 0
@@ -110,3 +111,4 @@ class BFR:
             cluster['N'] += 1
 
         return self.DS
+
