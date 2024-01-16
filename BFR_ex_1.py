@@ -39,32 +39,28 @@ class BFR:
 
         self.__init_dimension(centroids[0])
 
-        for i, centroid in enumerate(centroids):
-            cluster = {'SUM': centroid, 'SUMQ': centroid ** 2, 'N': 1}
-            self.DS.append(cluster)
+        self.DS = [{'SUM': centroid, 'SUMQ': centroid ** 2, 'N': 1} for centroid in centroids]
 
         return self.DS
 
     def fit(self, data_chunk):
-       # Schritt 1: Punkte sind nah einem Cluster von DS: Füge zu DS hinzu und update SUM, SUMQ, N für das jeweilige Cluster.
         for point in data_chunk:
             distances = [self.__calculate_Mahalanobis(cluster, point) for cluster in self.DS]
-            min_distance = min(distances)
-            min_distance_index = distances.index(min_distance)
+            min_distance_index = np.argmin(distances)
 
-            if min_distance < 2*np.sqrt(self.dimension):
-                self.DS[min_distance_index]['SUM'] += point
-                self.DS[min_distance_index]['SUMQ'] += point ** 2
-                self.DS[min_distance_index]['N'] += 1
+            if distances[min_distance_index] < 2 * np.sqrt(self.dimension):
+                cluster = self.DS[min_distance_index]
+                cluster['SUM'] += point
+                cluster['SUMQ'] += point ** 2
+                cluster['N'] += 1
             else:
                 self.RS.append(point)
-       # Schritt 2: Keiner der Punkte ist nah einem Cluster von DS: Nutze Kmeans zum Clustern dieser übrig geblieben Punkte, und die
-       # aus dem alten RS-Set. Entstehende Cluster gehen in CS, und die outliner in RS.
 
-       # Schritt 3: Ggfs. Merge Cluster in CS.
+        self.kmeans.fit(self.RS)
+        cluster_labels = self.kmeans.labels_
+        cluster_centers = self.kmeans.cluster_centers_
 
-       # Schritt 4: Merge die Cluster in CS und DS, die nah beieinander liegen. Merge Punkte in RS mit den Clustern in DS.
-
-
+        self.CS = [{'SUM': centroid, 'SUMQ': centroid ** 2, 'N': 1} for centroid in cluster_centers]
+        self.RS = [point for i in range(self.k) if i not in cluster_labels for point in self.RS]
 
         return self.DS, self.CS, self.RS
