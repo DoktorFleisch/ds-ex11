@@ -12,7 +12,7 @@ class BFR:
         """
         self.k = k
         self.dimension = 0
-        self.kmeans = KMeans(n_clusters=k, random_state=0, init='k-means++')
+        self.kmeans = KMeans(n_clusters=k, random_state=0, init='k-means++', n_init=10)
         self.DS = []
         self.CS = []
         self.RS = []
@@ -91,8 +91,7 @@ class BFR:
             sumq = np.sum(cluster ** 2, axis=0)
             self.DS.append({'SUM': sum, 'SUMQ': sumq, 'N': len(cluster)})
 
-        return self.DS
-
+        return
     def fit(self, data_chunk):
         """
         BFR Algorithmus.
@@ -120,7 +119,7 @@ class BFR:
         """
         Cluster alle verbleibenden Punkte in RS mit kmeans. Füge die Cluster in CS ein. Outlier werden in RS hinzugefügt.
         """
-        if len(self.RS) >= 0:
+        if len(self.RS) >= 2:
             self.kmeans.fit(self.RS)
             cluster_labels = self.kmeans.labels_
             cluster_centers = self.kmeans.cluster_centers_
